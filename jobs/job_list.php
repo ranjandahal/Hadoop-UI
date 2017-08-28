@@ -1,20 +1,45 @@
 <?php include '../view/header.php'; ?>
 <script>
-function showHint(str) {
-    if (str.length == 0) { 
-        document.getElementById("txtHint").innerHTML = "";
-        return;
-    } else {
-        var xmlhttp = new XMLHttpRequest();
-        xmlhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                document.getElementById("txtHint").innerHTML = this.responseText;
+    $(document).ready(function(){
+        function showHint(str) {
+            if (str.length == 0) { 
+                document.getElementById("txtHint").innerHTML = "";
+                return;
+            } else {
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        document.getElementById("txtHint").innerHTML = this.responseText;
+                    }
+                };
+                xmlhttp.open("POST", "upload.php?filename=" + str, true);
+                xmlhttp.send();
             }
-        };
-        xmlhttp.open("POST", "upload.php?filename=" + str, true);
-        xmlhttp.send();
-    }
-}
+        }
+        $('#upload').click(function(e){
+            $('#result').html('Uploading...');
+            readParts(0, document.getElementById('files').files[0].size - 1);
+            e.preventDefault();
+        });
+        
+        function readParts(myStart, myEnd) {
+            var files = document.getElementById('files').files;
+            var file = files[0];
+            var reader = new FileReader();
+            var myblob = file.slice(myStart, myEnd);
+            var myExt = "";
+            
+            reader.readAsBinaryString(myblob);
+            reader.onloadend = function(evt) {
+                if (evt.target.readyState == FileReader.DONE) {
+                    var myresult = evt.target.result;
+                    $.post("upload_script.php", {filename: file.name + myExt, data: myresult }).done(function(data) {
+                        document.getElementById('result').innerHTML =  "Done.<br /> Log:" + data;
+                    });
+                }
+            }
+        }
+    });
 </script>
 <main>
     <section>
@@ -94,6 +119,12 @@ function showHint(str) {
                                             </option>
                                     <?php } ?>
                                     </select>
+                                </td>
+                                <td>
+                                    <input type="file" id="files" name="file" /> 
+                                </td>
+                                <td>
+                                    <button id="upload" type="button">Upload File</button> <p id="result"></p>
                                 </td>
                             <?php } ?>
                         </tr>
