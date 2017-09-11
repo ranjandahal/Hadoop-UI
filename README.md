@@ -21,6 +21,7 @@ Project consists of below structure:
 3. Model folder consists of an array of job object that holds Hadoop sample prjects commands including arguments. This objects facilitate jobs.php file to provide jobs list in a dropdown list.
 ```
 Sample job object:
+
 $jobs[] = array('name' => 'Sort Random Data Writer', 
                 'command'=>'sort', 
                 'inst'=>'A map/reduce program that sorts the data written by the random writer.</br>
